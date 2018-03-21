@@ -3,13 +3,14 @@
 
 #include "cocos2d.h"
 #include "Player.h"
+#include "EnemyShip.h"
+
+#include <memory>
 
 class HelloWorld : public cocos2d::Scene
 {
 public:
     static cocos2d::Scene* createScene();
-
-    ~HelloWorld();
 
     bool init() override;
     void update(float delta) override;
@@ -18,12 +19,11 @@ public:
     CREATE_FUNC(HelloWorld);
 
 private:
-    Player * Ship;
-    Player * Ship2;
-
-    std::set<cocos2d::EventKeyboard::KeyCode> PressedKeys;
-
-
+    
+    std::vector<std::unique_ptr<EnemyShip>> Enemies;
+    std::unique_ptr<EnemyShip> E;
+    std::unique_ptr<Player> Ship;
+   
     void OnKeyPressed(cocos2d::EventKeyboard::KeyCode, cocos2d::Event*);
     void OnKeyReleased(cocos2d::EventKeyboard::KeyCode, cocos2d::Event*);
 };

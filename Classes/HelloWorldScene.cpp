@@ -8,12 +8,6 @@ Scene* HelloWorld::createScene()
     return HelloWorld::create();
 }
 
-HelloWorld::~HelloWorld()
-{
-    delete Ship;
-    delete Ship2;
-}
-
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
@@ -26,7 +20,29 @@ bool HelloWorld::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    Ship = new Player(visibleSize.width / 2 + origin.x, visibleSize.height / 3 + origin.y, "playerShip.png");
+    Ship.reset(
+        new Player(
+            visibleSize.width / 2 + origin.x,
+            visibleSize.height / 3 + origin.y,
+            "playerShip.png"
+        )
+    );
+
+    for (int i = 0; i < 4; ++i)
+    {
+        Enemies.push_back(
+            std::make_unique<EnemyShip>(
+                visibleSize.width / 2 + origin.x + ((rand() - 150) % 300),
+                visibleSize.height + origin.y,
+                10,
+                100 + (rand() % 150),
+                "enemyShip.png"
+            )
+        );
+
+        this->addChild(Enemies.back()->Sprite(), 0);
+    }
+
     this->addChild(Ship->Sprite(), 0);
 
     auto listener = EventListenerKeyboard::create();
@@ -39,42 +55,24 @@ bool HelloWorld::init()
     return true;
 }
 
+void HelloWorld::OnKeyReleased(EventKeyboard::KeyCode key, Event* event)
+{
+    Ship->RemoveUserAction(key);
+    return;
+}
+
 void HelloWorld::OnKeyPressed(EventKeyboard::KeyCode key, Event* event)
 {
-    PressedKeys.insert(key);
+    Ship->AddUserAction(key);
     return;
 }
 
 void HelloWorld::update(float delta)
 {
-    if (PressedKeys.find(EventKeyboard::KeyCode::KEY_D) != PressedKeys.end()) {
-        Vec2 pos = Ship->Sprite()->getPosition();
-        pos.x += +120 * delta;
-        Ship->Sprite()->setPosition(pos);
-    }
+    Ship->Update(delta);
 
-    if (PressedKeys.find(EventKeyboard::KeyCode::KEY_A) != PressedKeys.end()) {
-        Vec2 pos = Ship->Sprite()->getPosition();
-        pos.x += -120 * delta;
-        Ship->Sprite()->setPosition(pos);
+    for (auto& e : Enemies)
+    {
+        e->Update(delta);
     }
-
-    if (PressedKeys.find(EventKeyboard::KeyCode::KEY_W) != PressedKeys.end()) {
-        Vec2 pos = Ship->Sprite()->getPosition();
-        pos.y += +120 * delta;
-        Ship->Sprite()->setPosition(pos);
-    }
-
-    if (PressedKeys.find(EventKeyboard::KeyCode::KEY_S) != PressedKeys.end()) {
-        Vec2 pos = Ship->Sprite()->getPosition();
-        pos.y += -120 * delta;
-        Ship->Sprite()->setPosition(pos);
-    }
-}
-
-void HelloWorld::OnKeyReleased(EventKeyboard::KeyCode key, Event* event)
-{
-    if (PressedKeys.find(key) != PressedKeys.end())
-        PressedKeys.erase(key);
-    return;
 }
