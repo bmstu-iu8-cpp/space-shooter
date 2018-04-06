@@ -1,31 +1,30 @@
 #pragma once
 #include <cocos2d.h>
+#include "MovableObject.h"
 
 class Player
+    : public MovableObject
 {
 public:
-    Player(float x, float y, const std::string& filenamePicture);
-    ~Player() = default;
+    Player(float x, float y, const std::string& filenamePicture, std::set<cocos2d::EventKeyboard::KeyCode>* pressed);
 
-    cocos2d::Sprite * Sprite();
-    void Update(float delta);
+    void Update(float delta) override;
 
-    void AddUserAction(cocos2d::EventKeyboard::KeyCode);
-    void RemoveUserAction(cocos2d::EventKeyboard::KeyCode);
+    void OnCollision(GameObject*) override;
+
+    void UpVSpeed(float dx)
+    {
+        SetVSpeed(GetVSpeed() + dx);
+    }
+
+    void UpHSpeed(float dx)
+    {
+        SetHSpeed(GetHSpeed() + dx);
+    }
 private:
 
     bool HasUserAction(cocos2d::EventKeyboard::KeyCode);
-
-    void Update(float dx, float dy);
-
-    cocos2d::Sprite * View;
-    float X;
-    float Y;
-
-    float hSpeed;
-    float vSpeed;
-
-
-    std::set<cocos2d::EventKeyboard::KeyCode> PressedKeys;
+    
+    std::set<cocos2d::EventKeyboard::KeyCode>* PressedKeys;
 };
 
