@@ -108,7 +108,7 @@ void HelloWorld::update(float delta)
 
     GameObject* player = Objects.begin()->get();
     {
-        for (auto it = Objects.begin() + 1; it != Objects.end(); ++it)
+        for (auto it = Objects.rbegin() + 1; it != Objects.rend(); ++it)
         {
             GameObject* obj = it->get();
             bool yes = GameObject::Collision(player, obj);
